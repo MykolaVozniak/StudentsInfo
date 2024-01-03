@@ -1,9 +1,15 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Hello, user!</h1>
 
-Welcome to your new app.
+<MyTextBox placeholder = "regerger"></MyTextBox>
+<h1 @attributes = "@NewAttributes">TEXT</h1>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code{
+    private Dictionary<string, object> NewAttributes = new Dictionary<string, object>
+    {
+        {"class", "bg-danger" }
+    };
+}
