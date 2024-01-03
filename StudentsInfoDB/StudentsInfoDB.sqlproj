@@ -71,7 +71,6 @@
     <Build Include="dbo\Tables\Students.sql" />
     <Build Include="dbo\Stored Procedures\Groups\SP_Group_Create.sql" />
     <Build Include="dbo\Stored Procedures\Groups\SP_Group_Delete.sql" />
-    <Build Include="dbo\Stored Procedures\Groups\SP_Group_Read.sql" />
     <Build Include="dbo\Stored Procedures\Groups\SP_Group_Update.sql" />
     <Build Include="dbo\Stored Procedures\SP_Read_Records.sql" />
     <Build Include="dbo\Stored Procedures\Departments\SP_Department_Delete.sql" />
@@ -80,5 +79,12 @@
     <Build Include="dbo\Stored Procedures\Departments\SP_Department_Create.sql" />
     <Build Include="dbo\Stored Procedures\Faculties\SP_Faculty_Create.sql" />
     <Build Include="dbo\Stored Procedures\Students\SP_Student_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Groups\SP_Group_Read.sql" />
+    <Build Include="dbo\Stored Procedures\Departments\SP_Department_Read.sql" />
+    <Build Include="dbo\Stored Procedures\Faculties\SP_Faculty_Read.sql" />
+    <Build Include="dbo\Stored Procedures\Students\SP_Student_Read.sql" />
+    <Build Include="dbo\Stored Procedures\Departments\SP_Department_Update.sql" />
+    <Build Include="dbo\Stored Procedures\Faculties\SP_Faculty_Update.sql" />
+    <Build Include="dbo\Stored Procedures\Students\SP_Student_Update.sql" />
   </ItemGroup>
 </Project>
