@@ -1,7 +1,13 @@
-﻿namespace StudentsInfo.Constants
+﻿using System.Data.SqlClient;
+namespace StudentsInfo.Constants
 {
     public class DataBaseConstants
     {
+
+        private const string ConnectionString = "Data Source=DESKTOP-UNRBAFF\\SQLEXPRESS;Initial Catalog=StudentsInfoDB;Persist Security Info=True;User ID=sa;Password=mykola228";
+        public static SqlConnection GetConnection()
+            => new(ConnectionString);
+
         #region Dynamic
         public const string ReadRecords = "SP_Read_Records";
         #endregion
