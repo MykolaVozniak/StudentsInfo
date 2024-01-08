@@ -9,7 +9,7 @@ namespace StudentsInfo.Constants
             => new(ConnectionString);
 
         #region Dynamic
-        public const string ReadRecords = "SP_Read_Records";
+        public const string ReadRecords = "SP_Read_Records"; //used
         #endregion
 
         #region Students
@@ -31,10 +31,12 @@ namespace StudentsInfo.Constants
         public const string DepartmentRead = "SP_Department_Read";
         public const string DepartmentUpdate = "SP_Department_Update";
         public const string DepartmentDelete = "SP_Department_Delete";
+
+        public const string ReadDepartmentsByFacultyId = "SP_Read_Departments_By_FacultyId"; //used
         #endregion
 
         #region Faculties
-        public const string FacultyCreate = "SP_Faculty_Create";
+        public const string FacultyCreate = "SP_Faculty_Create"; //used
         public const string FacultyRead = "SP_Faculty_Read";
         public const string FacultyUpdate = "SP_Faculty_Update";
         public const string FacultyDelete = "SP_Faculty_Delete";

@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject DialogService DialogService
 
 <PageTitle>Home</PageTitle>
 <TopRow Title="Home"></TopRow>
@@ -8,9 +9,16 @@
 <MyTextBox placeholder = "regerger"></MyTextBox>
 <h1 @attributes = "@NewAttributes">TEXT</h1>
 
+<RadzenButton Click="@ButtonClicked" Text="Hi"></RadzenButton>
+
 @code{
     private Dictionary<string, object> NewAttributes = new Dictionary<string, object>
     {
         {"class", "bg-danger" }
     };
+
+    void ButtonClicked()
+    {
+        DialogService.Alert("Hi");
+    }
 }
