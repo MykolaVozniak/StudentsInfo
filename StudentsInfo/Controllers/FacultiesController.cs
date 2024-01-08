@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StudentsInfo.Constants;
 using StudentsInfo.Models;
 using System.Data;
+using System.Xml.Linq;
 
 namespace StudentsInfo.Controllers
 {
@@ -43,6 +44,60 @@ namespace StudentsInfo.Controllers
                     return parameters.Get<int>("@NewFacultyId");
                 }
                 return 0;
+            }
+        }
+
+        public bool DeleteFaculty(int id)
+        {
+            using (var connection = DataBaseConstants.GetConnection())
+            {
+                connection.Open();
+                var parameters = new
+                {
+                    FacultyId = id
+                };
+                var rows = connection.Execute(
+                    DataBaseConstants.FacultyDelete,
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
+
+                return rows > 0;
+            }
+        }
+
+        public Faculty ReadFaculty(int id)
+        {
+            using (var connection = DataBaseConstants.GetConnection())
+            {
+                connection.Open();
+                var parameters = new
+                {
+                    FacultyId = id
+                };
+                var faculty = connection.QueryFirstOrDefault<Faculty>(
+                    DataBaseConstants.FacultyRead,
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
+                return faculty;
+            }
+        }
+
+        public bool UpdateFaculty(Faculty faculty)
+        {
+            using (var connection = DataBaseConstants.GetConnection())
+            {
+                connection.Open();
+                var parameters = new
+                {
+                    FacultyId = faculty.Id,
+                    Name = faculty.Name,
+                    Description = faculty.Description,
+                };
+                var rows = connection.Execute(
+                    DataBaseConstants.FacultyUpdate,
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
+                return rows > 0;
             }
         }
     }

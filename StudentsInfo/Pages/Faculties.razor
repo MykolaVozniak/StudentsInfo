@@ -25,19 +25,15 @@
         <RadzenDataGridColumn TItem="Faculty" Title="Дії" Sortable="false" Filterable="false">
 
             <Template Context="faculty">
-                @* <button class="btn btn-warning btn-sm" @onclick="() => ShowModalEdit(faculty.Id)">
-                    <span class="oi oi-pencil" aria-hidden="true"></span>
-                </button> *@
-                <button class="btn btn-danger btn-sm" @onclick="@(async () => await DeleteFaculty(faculty.Id))">
-                    <span class="oi oi-x" aria-hidden="true"></span>
-                </button>
+                <RadzenButton ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Click="() => ShowModalEdit(faculty.Id)"><span class="oi oi-pencil" aria-hidden="true"></span></RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="@(async () => await DeleteFaculty(faculty.Id))"><span class="oi oi-x" aria-hidden="true"></span></RadzenButton>
             </Template>
 
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
-<div class="container d-flex justify-content-center mb-3">
+<div class="container d-flex justify-content-center my-3">
     <button class="btn btn-success w-25" @onclick="ShowModalCreate">Додати факультет</button>
 </div>
 
@@ -116,6 +112,81 @@
     </div>
 }
 
+<!-- Modal Edit -->
+@if (showModalEdit)
+{
+    <div class="modal fade show d-block bg-white bg-opacity-50">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title ms-2">Edit Employee</h2>
+                    <button type="button" class="btn-close" @onclick="HideModalEdit"></button>
+                </div>
+                <div class="modal-body">
+                    <RadzenTemplateForm TItem="FacultiesModel" Data="@facultiesModel" Submit="async () => await EditFaculty()">
+                        <RadzenRow Gap="1rem" JustifyContent="JustifyContent.Center">
+                            <RadzenColumn SizeSM="6" SizeMD="10">
+                                <RadzenStack>
+
+                                    <RadzenFormField Text="Назва" Variant="@variant">
+                                        <RadzenTextBox @bind-Value="@facultiesModel.Name" Name="Name" />
+                                        <RadzenRequiredValidator Component="Name" Text="Назва є обов'язковою" />
+                                    </RadzenFormField>
+
+                                    <RadzenFormField Text="Примітка" Variant="@variant">
+                                        <RadzenTextBox @bind-Value="@facultiesModel.Description" Name="Description" />
+                                    </RadzenFormField>
+
+                                    <RadzenRow>
+                                        <RadzenColumn SizeSM="6" SizeMD="10">
+                                            <RadzenStack>
+                                                <RadzenFormField Text="@departmentNumber" Variant="@variant">
+                                                    <RadzenTextBox @bind-Value="@newDepartmentName" />
+                                                </RadzenFormField>
+                                            </RadzenStack>
+                                        </RadzenColumn>
+                                        <RadzenColumn>
+                                            <RadzenFormField>
+                                                <RadzenButton ButtonStyle="ButtonStyle.Success" Click="AddNewDepartment"><span class="oi oi-plus pt-1" aria-hidden="true"></span></RadzenButton>
+                                            </RadzenFormField>
+                                        </RadzenColumn>
+                                    </RadzenRow>
+
+                                    @if (departmentsModels.Count != 0)
+                                    {
+                                        <RadzenFieldset Text="Кафедри:">
+                                            <ul>
+                                                @foreach (var departmentModel in departmentsModels)
+                                                {
+                                                    <li>
+                                                        <div class="row">
+                                                            <div class="col col-9">
+                                                                @departmentModel.Name
+                                                            </div>
+                                                            <div class="col col-3">
+                                                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="() => RemoveDepartment(departmentModel)"><span class="oi oi-x" aria-hidden="true"></span></RadzenButton>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </RadzenFieldset>
+                                    }
+
+                                </RadzenStack>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <div class="modal-footer mt-4">
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Відмінити" Variant="Variant.Flat" Click="HideModalEdit" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text="Зберегти" Variant="Variant.Flat" />
+                        </div>
+                    </RadzenTemplateForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code{
     private class FacultiesModel
     {
@@ -132,6 +203,7 @@
     }
 
     private FacultiesModel facultiesModel = new FacultiesModel();
+    private DepartmentsModel departmentModel = new DepartmentsModel();
     private List<DepartmentsModel> departmentsModels = new List<DepartmentsModel>();
 
     //Data
@@ -198,7 +270,7 @@
             new Department
                 {
                     Name = i.Name,
-                    FacultyId = result
+                    FacultyId = result,
                 }
         );
         }
@@ -207,13 +279,18 @@
         HideModalCreate();
     }
 
+    private void UpdateDepartmentsCount()
+    {
+        departmentNumber = $"Кафедра{departmentsModels.Count + 1}";
+    }
+
     private void AddNewDepartment()
     {
         if (!string.IsNullOrWhiteSpace(newDepartmentName))
         {
             departmentsModels.Add(new DepartmentsModel { Name = newDepartmentName });
             newDepartmentName = "";
-            departmentNumber = $"Кафедра{departmentsModels.Count+1}";
+            UpdateDepartmentsCount();
         }
     }
 
@@ -223,21 +300,79 @@
     }
 
     //Delete
-    public bool DeleteCategory(int id)
+    private async Task DeleteFaculty(int id)
     {
-        using (var connection = DataBaseConstants.GetConnection())
-        {
-            connection.Open();
-            var parameters = new
-            {
-                CategoryId = id
-            };
-            var rows = connection.Execute(
-                DataBaseConstants.CategoryDelete,
-                parameters,
-                commandType: CommandType.StoredProcedure);
+        var facultiesController = new FacultiesController();
+        facultiesController.DeleteFaculty(id);
+        RefreshTable();
+    }
 
-            return rows > 0;
+    //Edit modal
+    private bool showModalEdit = false;
+
+    private void ShowModalEdit(int id)
+    {
+        var facultiesController = new FacultiesController();
+        var facultyResult = facultiesController.ReadFaculty(id);
+        facultiesModel = new FacultiesModel()
+            {
+                Id = facultyResult.Id,
+                Name = facultyResult.Name,
+                Description = facultyResult.Description,
+            };
+
+        var departmentsResult = GetDepartments(id);
+        foreach (var i in departmentsResult)
+        {
+            departmentsModels.Add(
+                new DepartmentsModel
+                {
+                    Id = i.Id,
+                    Name = i.Name,
+                    FacultyId = i.FacultyId,
+                }
+            );
         }
+
+        UpdateDepartmentsCount();
+
+        showModalEdit = true;
+    }
+
+    private void HideModalEdit()
+    {
+        showModalEdit = false;
+        facultiesModel = new FacultiesModel();
+        departmentsModels = new List<DepartmentsModel>();
+        departmentNumber = "Кафедра1";
+    }
+
+    //Logic Edit
+    private async Task EditFaculty()
+    {
+        var facultiesController = new FacultiesController();
+        var result = facultiesController.UpdateFaculty(new Faculty
+            {
+                Id = facultiesModel.Id,
+                Name = facultiesModel.Name,
+                Description = facultiesModel.Description,
+            });
+
+        var departmentsController = new DepartmentsController();
+        departmentsController.DeleteDepartments(facultiesModel.Id);
+        foreach (var i in departmentsModels)
+        {
+            departmentsController.CreateDepartment(
+            new Department
+                {
+                    Name = i.Name,
+                    FacultyId = facultiesModel.Id,
+                }
+        );
+        }
+
+
+        RefreshTable();
+        HideModalEdit();
     }
 }

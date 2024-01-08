@@ -44,5 +44,23 @@ namespace StudentsInfo.Controllers
                 return rows > 0;
             }
         }
+
+        public bool DeleteDepartments(int id)
+        {
+            using (var connection = DataBaseConstants.GetConnection())
+            {
+                connection.Open();
+                var parameters = new
+                {
+                    FacultyId = id
+                };
+                var rows = connection.Execute(
+                    DataBaseConstants.DeleteDepartmentsByFacultyId,
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
+
+                return rows > 0;
+            }
+        }
     }
 }

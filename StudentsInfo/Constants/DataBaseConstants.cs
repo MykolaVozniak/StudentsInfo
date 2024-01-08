@@ -33,6 +33,7 @@ namespace StudentsInfo.Constants
         public const string DepartmentDelete = "SP_Department_Delete";
 
         public const string ReadDepartmentsByFacultyId = "SP_Read_Departments_By_FacultyId"; //used
+        public const string DeleteDepartmentsByFacultyId = "SP_Delete_Departments_By_FacultyId";
         #endregion
 
         #region Faculties
