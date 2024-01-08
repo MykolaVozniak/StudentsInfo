@@ -297,6 +297,7 @@
     private void RemoveDepartment(DepartmentsModel departmentModel)
     {
         departmentsModels.Remove(departmentModel);
+        UpdateDepartmentsCount();
     }
 
     //Delete
@@ -370,7 +371,6 @@
                 }
         );
         }
-
 
         RefreshTable();
         HideModalEdit();
