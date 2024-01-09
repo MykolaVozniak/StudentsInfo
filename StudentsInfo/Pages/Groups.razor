@@ -50,11 +50,12 @@
 
                                     <RadzenFormField Text="Назва" Variant="@variant">
                                         <RadzenTextBox @bind-Value="@groupModel.Name" Name="Name" />
-                                        <RadzenRequiredValidator Component="Name" Text="Назва є обов'язковою" />
+                                        <RadzenRequiredValidator Component="Name" Text="Обов'язкове поле!" />
                                     </RadzenFormField>
 
                                     <RadzenFormField Text="Факультет" Variant="@variant">
                                         <RadzenDropDownDataGrid @bind-Value=@groupModel.FacultyId Data=@faculties TextProperty="Name" ValueProperty="Id" Name="DropDownDataGridBindValue" />
+                                        <RadzenRequiredValidator Component="DropDownDataGridBindValue" Text="Обов'язкове поле!" />
                                     </RadzenFormField>
                                     
                                 </RadzenStack>
@@ -89,11 +90,12 @@
 
                                     <RadzenFormField Text="Назва" Variant="@variant">
                                         <RadzenTextBox @bind-Value="@groupModel.Name" Name="Name" />
-                                        <RadzenRequiredValidator Component="Name" Text="Назва є обов'язковою" />
+                                        <RadzenRequiredValidator Component="Name" Text="Обов'язкове поле!" />
                                     </RadzenFormField>
 
                                     <RadzenFormField Text="Факультет" Variant="@variant">
                                         <RadzenDropDownDataGrid @bind-Value=@groupModel.FacultyId Data=@faculties TextProperty="Name" ValueProperty="Id" Name="DropDownDataGridBindValue" />
+                                        <RadzenRequiredValidator Component="DropDownDataGridBindValue" Text="Обов'язкове поле!" />
                                     </RadzenFormField>
 
                                 </RadzenStack>
@@ -126,6 +128,10 @@
     {
         var facultiesController = new FacultiesController();
         int facultyIdValue = FacultyId.GetValueOrDefault();
+        if (facultyIdValue is 0)
+        {
+            return "";
+        }
         var result = facultiesController.ReadFaculty(facultyIdValue);
         return result.Name;
     }

@@ -29,6 +29,111 @@
     </Columns>
 </RadzenDataGrid>
 
+<div class="container d-flex justify-content-center my-3">
+    <button class="btn btn-success w-25" @onclick="ShowModalCreate">Додати студента</button>
+</div>
+
+<!-- Modal Create -->
+@if (showModalCreate)
+{
+    <div class="modal fade show d-block bg-white bg-opacity-50">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title ms-2">Додати студента</h2>
+                    <button type="button" class="btn-close" @onclick="HideModalCreate"></button>
+                </div>
+                <div class="modal-body">
+                    <RadzenTemplateForm TItem="StudentModel" Data="@studentModel" Submit="@AddStudent">
+                        <RadzenRow Gap="1rem" JustifyContent="JustifyContent.Center">
+                            <RadzenColumn SizeSM="6" SizeMD="10">
+                                <RadzenStack>
+
+                                    <RadzenFormField Text="Прізвище" Variant="@variant">
+                                        <RadzenTextBox @bind-Value="@studentModel.LastName" Name="LastName" />
+                                        <RadzenRequiredValidator Component="LastName" Text="Обов'язкове поле!" />
+                                    </RadzenFormField>
+
+                                    <RadzenFormField Text="Ім'я" Variant="@variant">
+                                        <RadzenTextBox @bind-Value="@studentModel.FirstName" Name="FirstName" />
+                                        <RadzenRequiredValidator Component="FirstName" Text="Обов'язкове поле!" />
+                                    </RadzenFormField>
+
+                                    <RadzenFormField Text="Середній бал" Variant="@variant">
+                                        <RadzenNumeric @bind-Value="@studentModel.AverageScore" Name="AverageScore" />
+                                        <RadzenRequiredValidator Component="AverageScore" Text="Обов'язкове поле!" />
+                                    </RadzenFormField>
+
+                                    <RadzenFormField Text="Група" Variant="@variant">
+                                        <RadzenDropDownDataGrid @bind-Value=@studentModel.GroupId Data=@groups TextProperty="Name" ValueProperty="Id" Name="DropDownDataGridBindValue" />
+                                        <RadzenRequiredValidator Component="DropDownDataGridBindValue" Text="Обов'язкове поле!" />
+                                    </RadzenFormField>
+
+                                </RadzenStack>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <div class="modal-footer mt-4">
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Відмінити" Variant="Variant.Flat" Click="HideModalCreate" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text="Зберегти" Variant="Variant.Flat" />
+                        </div>
+                    </RadzenTemplateForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<!-- Modal Edit -->
+@if (showModalEdit)
+{
+    <div class="modal fade show d-block bg-white bg-opacity-50">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title ms-2">Редагувати дані студента</h2>
+                    <button type="button" class="btn-close" @onclick="HideModalEdit"></button>
+                </div>
+                <div class="modal-body">
+                    <RadzenTemplateForm TItem="StudentModel" Data="@studentModel" Submit="@EditStudent">
+                        <RadzenRow Gap="1rem" JustifyContent="JustifyContent.Center">
+                            <RadzenColumn SizeSM="6" SizeMD="10">
+                                <RadzenStack>
+
+                                    <RadzenFormField Text="Прізвище" Variant="@variant">
+                                        <RadzenTextBox @bind-Value="@studentModel.LastName" Name="LastName" />
+                                        <RadzenRequiredValidator Component="LastName" Text="Обов'язкове поле!" />
+                                    </RadzenFormField>
+
+                                    <RadzenFormField Text="Ім'я" Variant="@variant">
+                                        <RadzenTextBox @bind-Value="@studentModel.FirstName" Name="FirstName" />
+                                        <RadzenRequiredValidator Component="FirstName" Text="Обов'язкове поле!" />
+                                    </RadzenFormField>
+
+                                    <RadzenFormField Text="Середній бал" Variant="@variant">
+                                        <RadzenNumeric @bind-Value="@studentModel.AverageScore" Name="AverageScore" />
+                                        <RadzenRequiredValidator Component="AverageScore" Text="Обов'язкове поле!" />
+                                    </RadzenFormField>
+
+                                    <RadzenFormField Text="Група" Variant="@variant">
+                                        <RadzenDropDownDataGrid @bind-Value=@studentModel.GroupId Data=@groups TextProperty="Name" ValueProperty="Id" Name="DropDownDataGridBindValue" />
+                                        <RadzenRequiredValidator Component="DropDownDataGridBindValue" Text="Обов'язкове поле!" />
+                                    </RadzenFormField>
+
+                                </RadzenStack>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <div class="modal-footer mt-4">
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Відмінити" Variant="Variant.Flat" Click="HideModalEdit" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text="Зберегти" Variant="Variant.Flat" />
+                        </div>
+                    </RadzenTemplateForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code{
     private class StudentModel
     {
@@ -49,6 +154,10 @@
     {
         var groupsController = new GroupsController();
         int groupIdValue = GroupId.GetValueOrDefault();
+        if (groupIdValue is 0)
+        {
+            return "";
+        }
         var result = groupsController.ReadGroup(groupIdValue);
         return result.Name;
     }
@@ -78,12 +187,57 @@
         RefreshTable();
     }
 
+    //Modal Create
+    private bool showModalCreate = false;
+    Variant variant = Variant.Outlined;
+
+    private void ShowModalCreate()
+    {
+        studentModel = new StudentModel();
+        showModalCreate = true;
+    }
+
+    private void HideModalCreate()
+    {
+        showModalCreate = false;
+        studentModel = new StudentModel();
+    }
+
+    //Func Create
+    private void AddStudent()
+    {
+        var studentsController = new StudentsController();
+        studentsController.CreateStudent(
+            new Student
+                {
+                    FirstName = studentModel.FirstName,
+                    LastName = studentModel.LastName,
+                    AverageScore = studentModel.AverageScore,
+                    GroupId = studentModel.GroupId,
+                    RegistrationDate = DateTime.Now,
+                }
+        );
+        RefreshTable();
+        HideModalCreate();
+    }
+
     //Modal Edit
     private bool showModalEdit = false;
 
     private void ShowModalEdit(int id)
     {
-
+        var studentsController = new StudentsController();
+        var result = studentsController.ReadStudent(id);
+        studentModel = new StudentModel()
+            {
+                Id = result.Id,
+                FirstName = result.FirstName,
+                LastName = result.LastName,
+                AverageScore = result.AverageScore,
+                GroupId = result.GroupId,
+                RegistrationDate = result.RegistrationDate
+            };
+        showModalEdit = true;
     }
 
     private void HideModalEdit()
@@ -91,4 +245,23 @@
         showModalEdit = false;
         studentModel = new StudentModel();
     }
+
+    //Func Student
+    private async Task EditStudent()
+    {
+        var studentsController = new StudentsController();
+        var result = studentsController.UpdateStudent(new Student
+            {
+                Id = studentModel.Id,
+                FirstName = studentModel.FirstName,
+                LastName = studentModel.LastName,
+                AverageScore = studentModel.AverageScore,
+                GroupId = studentModel.GroupId,
+                RegistrationDate = studentModel.RegistrationDate
+            });
+
+        RefreshTable();
+        HideModalEdit();
+    }
+
 }

@@ -69,6 +69,7 @@ namespace StudentsInfo.Controllers
                 {
                     FirstName = student.FirstName,
                     LastName = student.LastName,
+                    RegistrationDate = student.RegistrationDate,
                     AverageScore = student.AverageScore,
                     GroupId = student.GroupId,
                 };
@@ -90,7 +91,7 @@ namespace StudentsInfo.Controllers
                     StudentId = student.Id,
                     FirstName = student.FirstName,
                     LastName = student.LastName,
-                    RegistrationDate = DateTime.Now,
+                    RegistrationDate = student.RegistrationDate,
                     AverageScore = student.AverageScore,
                     GroupId = student.GroupId,
     };
