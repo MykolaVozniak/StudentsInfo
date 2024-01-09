@@ -94,12 +94,46 @@ namespace StudentsInfo.Controllers
                     RegistrationDate = student.RegistrationDate,
                     AverageScore = student.AverageScore,
                     GroupId = student.GroupId,
-    };
+                };
                 var rows = connection.Execute(
                     DataBaseConstants.StudentUpdate,
                     parameters,
                     commandType: CommandType.StoredProcedure);
                 return rows > 0;
+            }
+        }
+
+        public int GetStudentCount(int groupId)
+        {
+            using (var connection = DataBaseConstants.GetConnection())
+            {
+                connection.Open();
+                var parameters = new
+                {
+                    GroupId = groupId
+                };
+                var studentCount = connection.ExecuteScalar<int>(
+                    DataBaseConstants.GetStudentCount,
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
+                return studentCount;
+            }
+        }
+
+        public double? GetAverage(int groupId)
+        {
+            using (var connection = DataBaseConstants.GetConnection())
+            {
+                connection.Open();
+                var parameters = new
+                {
+                    GroupId = groupId
+                };
+                var averageScore = connection.ExecuteScalar<double?>(
+                    DataBaseConstants.GetAverageScore,
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
+                return averageScore;
             }
         }
     }

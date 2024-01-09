@@ -102,22 +102,5 @@ namespace StudentsInfo.Controllers
             }
         }
 
-        public string GetFacultyName(int? id)
-        {
-            using (var connection = DataBaseConstants.GetConnection())
-            {
-                connection.Open();
-                var parameters = new
-                {
-                    FacultyId = id
-                };
-                var name = connection.QueryFirstOrDefault<string>(
-                    DataBaseConstants.GetFacultyName,
-                    parameters,
-                    commandType: CommandType.StoredProcedure);
-                return name;
-            }
-        }
-
     }
 }

@@ -17,8 +17,16 @@
                 @GetFacultyName(group.FacultyId)
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ModelsGroup" Property="" Title="К-сть студентів" />
-        <RadzenDataGridColumn TItem="ModelsGroup" Property="" Title="Середній бал групи" />
+        <RadzenDataGridColumn TItem="ModelsGroup" Property="" Title="К-сть студентів">
+            <Template Context="group">
+                @GetStudentsCount(group.Id)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ModelsGroup" Property="" Title="Середній бал групи" >
+            <Template Context="group">
+                @GetGroupAvg(group.Id)
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ModelsGroup" Title="Дії" Sortable="false" Filterable="false">
             <Template Context="group">
                 <RadzenButton ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Click="() => ShowModalEdit(group.Id)"><span class="oi oi-pencil" aria-hidden="true"></span></RadzenButton>
@@ -124,10 +132,10 @@
     private List<Faculty> faculties;
 
     //Data
-    private string GetFacultyName(int? FacultyId)
+    private string GetFacultyName(int? facultyId)
     {
         var facultiesController = new FacultiesController();
-        int facultyIdValue = FacultyId.GetValueOrDefault();
+        int facultyIdValue = facultyId.GetValueOrDefault();
         if (facultyIdValue is 0)
         {
             return "";
@@ -136,12 +144,19 @@
         return result.Name;
     }
 
-    private void GetStudentsCount()
+    private int GetStudentsCount(int groupId)
     {
+        var studentsController = new StudentsController();
+        int result = studentsController.GetStudentCount(groupId);
+        return result;
     }
 
-    private void GetGroupAvg()
+    private double GetGroupAvg(int groupId)
     {
+        var studentsController = new StudentsController();
+        double result = studentsController.GetAverage(groupId).GetValueOrDefault();
+        result = Math.Round(result, 2);
+        return result;
     }
 
     private List<ModelsGroup> groups;

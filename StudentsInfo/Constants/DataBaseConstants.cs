@@ -17,6 +17,9 @@ namespace StudentsInfo.Constants
         public const string StudentRead = "SP_Student_Read";
         public const string StudentUpdate = "SP_Student_Update";
         public const string StudentDelete = "SP_Student_Delete";
+
+        public const string GetStudentCount = "SP_Get_Student_Count_By_Group_Id";
+        public const string GetAverageScore = "SP_Get_Average_Score_By_Group_Id";
         #endregion
 
         #region Groups
@@ -41,8 +44,6 @@ namespace StudentsInfo.Constants
         public const string FacultyRead = "SP_Faculty_Read";
         public const string FacultyUpdate = "SP_Faculty_Update";
         public const string FacultyDelete = "SP_Faculty_Delete";
-
-        public const string GetFacultyName = "SP_Get_Faculty_Name";
         #endregion
     }
 }
