@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StudentsInfo.Constants;
 using StudentsInfo.Models;
 using System.Data;
+using System.Data.SqlClient;
 using System.Xml.Linq;
 
 namespace StudentsInfo.Controllers
@@ -100,5 +101,23 @@ namespace StudentsInfo.Controllers
                 return rows > 0;
             }
         }
+
+        public string GetFacultyName(int? id)
+        {
+            using (var connection = DataBaseConstants.GetConnection())
+            {
+                connection.Open();
+                var parameters = new
+                {
+                    FacultyId = id
+                };
+                var name = connection.QueryFirstOrDefault<string>(
+                    DataBaseConstants.GetFacultyName,
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
+                return name;
+            }
+        }
+
     }
 }

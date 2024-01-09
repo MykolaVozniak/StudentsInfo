@@ -1,5 +1,237 @@
 ﻿@page "/groups"
+@using StudentsInfo.Controllers
+@using StudentsInfo.Models
+@using ModelsGroup = StudentsInfo.Models.Group;
 
 <PageTitle>Групи</PageTitle>
 
 <h1>Групи</h1>
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@groups" TItem="ModelsGroup" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <Columns>
+        <RadzenDataGridColumn TItem="ModelsGroup" Property="Id" Title="Id" />
+        <RadzenDataGridColumn TItem="ModelsGroup" Property="Name" Title="Назва Групи" />
+        <RadzenDataGridColumn TItem="ModelsGroup" Title="Факультет">
+            <Template Context="group">
+                @GetFacultyName(group.FacultyId)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ModelsGroup" Property="" Title="К-сть студентів" />
+        <RadzenDataGridColumn TItem="ModelsGroup" Property="" Title="Середній бал групи" />
+        <RadzenDataGridColumn TItem="ModelsGroup" Title="Дії" Sortable="false" Filterable="false">
+            <Template Context="group">
+                <RadzenButton ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Click="() => ShowModalEdit(group.Id)"><span class="oi oi-pencil" aria-hidden="true"></span></RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="@(async () => await DeleteGroup(group.Id))"><span class="oi oi-x" aria-hidden="true"></span></RadzenButton>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<div class="container d-flex justify-content-center my-3">
+    <button class="btn btn-success w-25" @onclick="ShowModalCreate">Додати групу</button>
+</div>
+
+<!-- Modal Create -->
+@if (showModalCreate)
+{
+    <div class="modal fade show d-block bg-white bg-opacity-50">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title ms-2">Додати групу</h2>
+                    <button type="button" class="btn-close" @onclick="HideModalCreate"></button>
+                </div>
+                <div class="modal-body">
+                    <RadzenTemplateForm TItem="GroupModel" Data="@groupModel" Submit="@AddGroup">
+                        <RadzenRow Gap="1rem" JustifyContent="JustifyContent.Center">
+                            <RadzenColumn SizeSM="6" SizeMD="10">
+                                <RadzenStack>
+
+                                    <RadzenFormField Text="Назва" Variant="@variant">
+                                        <RadzenTextBox @bind-Value="@groupModel.Name" Name="Name" />
+                                        <RadzenRequiredValidator Component="Name" Text="Назва є обов'язковою" />
+                                    </RadzenFormField>
+
+                                    <RadzenFormField Text="Факультет" Variant="@variant">
+                                        <RadzenDropDownDataGrid @bind-Value=@groupModel.FacultyId Data=@faculties TextProperty="Name" ValueProperty="Id" Name="DropDownDataGridBindValue" />
+                                    </RadzenFormField>
+                                    
+                                </RadzenStack>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <div class="modal-footer mt-4">
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Відмінити" Variant="Variant.Flat" Click="HideModalCreate" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text="Зберегти" Variant="Variant.Flat" />
+                        </div>
+                    </RadzenTemplateForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Modal Edit -->
+@if (showModalEdit)
+{
+    <div class="modal fade show d-block bg-white bg-opacity-50">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title ms-2">Редагувати групу</h2>
+                    <button type="button" class="btn-close" @onclick="HideModalEdit"></button>
+                </div>
+                <div class="modal-body">
+                    <RadzenTemplateForm TItem="GroupModel" Data="@groupModel" Submit="@EditGroup">
+                        <RadzenRow Gap="1rem" JustifyContent="JustifyContent.Center">
+                            <RadzenColumn SizeSM="6" SizeMD="10">
+                                <RadzenStack>
+
+                                    <RadzenFormField Text="Назва" Variant="@variant">
+                                        <RadzenTextBox @bind-Value="@groupModel.Name" Name="Name" />
+                                        <RadzenRequiredValidator Component="Name" Text="Назва є обов'язковою" />
+                                    </RadzenFormField>
+
+                                    <RadzenFormField Text="Факультет" Variant="@variant">
+                                        <RadzenDropDownDataGrid @bind-Value=@groupModel.FacultyId Data=@faculties TextProperty="Name" ValueProperty="Id" Name="DropDownDataGridBindValue" />
+                                    </RadzenFormField>
+
+                                </RadzenStack>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <div class="modal-footer mt-4">
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Відмінити" Variant="Variant.Flat" Click="HideModalEdit" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text="Зберегти" Variant="Variant.Flat" />
+                        </div>
+                    </RadzenTemplateForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code{
+    private class GroupModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int? FacultyId { get; set; }
+    }
+
+    private GroupModel groupModel = new GroupModel();
+    private List<Faculty> faculties;
+
+    //Data
+    private string GetFacultyName(int? FacultyId)
+    {
+        var facultiesController = new FacultiesController();
+        var name = facultiesController.GetFacultyName(FacultyId);
+        return name;
+    }
+
+    private void GetStudentsCount()
+    {
+    }
+
+    private void GetGroupAvg()
+    {
+    }
+
+    private List<ModelsGroup> groups;
+
+    private void RefreshTable()
+    {
+        var groupsController = new GroupsController();
+        groups = groupsController.ReadGroups().ToList();
+
+        var facultiesController = new FacultiesController();
+        faculties = facultiesController.ReadFaculties().ToList();
+        StateHasChanged();
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        RefreshTable();
+    }
+
+    //Delete
+    private async Task DeleteGroup(int id)
+    {
+        var groupsController = new GroupsController();
+        groupsController.DeleteGroup(id);
+        RefreshTable();
+    }
+
+    // Modal Create
+    private bool showModalCreate = false;
+    Variant variant = Variant.Outlined;
+
+    private void ShowModalCreate()
+    {
+        groupModel = new GroupModel();
+        showModalCreate = true;
+    }
+
+    private void HideModalCreate()
+    {
+        showModalCreate = false;
+        groupModel = new GroupModel();
+    }
+
+    // Func Create
+
+    private void AddGroup()
+    {
+        var groupsController = new GroupsController();
+
+        var result = groupsController.CreateGroup(
+            new ModelsGroup
+                {
+                    Name = groupModel.Name,
+                    FacultyId = groupModel.FacultyId
+                }
+        );
+
+        RefreshTable();
+        HideModalCreate();
+    }
+
+    //Modal Edit
+    private bool showModalEdit = false;
+
+    private void ShowModalEdit(int id)
+    {
+        var groupsController = new GroupsController();
+        var result = groupsController.ReadGroup(id);
+        groupModel = new GroupModel()
+            {
+                Id = result.Id,
+                Name = result.Name,
+                FacultyId = result.FacultyId
+            };
+        showModalEdit = true;
+    }
+
+    private void HideModalEdit()
+    {
+        showModalEdit = false;
+        groupModel = new GroupModel();
+    }
+
+    //Func Edit
+    private async Task EditGroup()
+    {
+        var groupsController = new GroupsController();
+        var result = groupsController.UpdateGroup(new ModelsGroup
+            {
+                Id = groupModel.Id,
+                Name = groupModel.Name,
+                FacultyId = groupModel.FacultyId,
+            });
+
+        RefreshTable();
+        HideModalEdit();
+    }
+}

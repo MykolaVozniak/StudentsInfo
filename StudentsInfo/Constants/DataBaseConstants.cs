@@ -41,6 +41,8 @@ namespace StudentsInfo.Constants
         public const string FacultyRead = "SP_Faculty_Read";
         public const string FacultyUpdate = "SP_Faculty_Update";
         public const string FacultyDelete = "SP_Faculty_Delete";
+
+        public const string GetFacultyName = "SP_Get_Faculty_Name";
         #endregion
     }
 }
