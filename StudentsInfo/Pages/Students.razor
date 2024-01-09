@@ -1,5 +1,94 @@
 ﻿@page "/students"
+@using StudentsInfo.Controllers
+@using StudentsInfo.Models
+@using ModelsGroup = StudentsInfo.Models.Group;
 
 <PageTitle>Студенти</PageTitle>
 
 <h1>Студенти</h1>
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@students" TItem="Student" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <Columns>
+        <RadzenDataGridColumn TItem="Student" Property="Id" Title="Id" />
+        <RadzenDataGridColumn TItem="Student" Property="LastName" Title="Прізвище" />
+        <RadzenDataGridColumn TItem="Student" Property="FirstName" Title="Ім'я" />
+        <RadzenDataGridColumn TItem="Student" Title="Група" >
+            <Template Context="student">
+                @GetGroupName(student.GroupId)
+            </Template>
+            </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Student" Property="AverageScore" Title="Середній бал" />
+        <RadzenDataGridColumn TItem="Student" Property="RegistrationDate" Title="Дата реєстрації" />
+        <RadzenDataGridColumn TItem="Student" Title="Дії" Sortable="false" Filterable="false">
+            <Template Context="student">
+                <RadzenButton ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Click="() => ShowModalEdit(student.Id)"><span class="oi oi-pencil" aria-hidden="true"></span></RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="@(async () => await DeleteStudent(student.Id))"><span class="oi oi-x" aria-hidden="true"></span></RadzenButton>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code{
+    private class StudentModel
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateTime RegistrationDate { get; set; }
+        public double? AverageScore { get; set; }
+        public int? GroupId { get; set; }
+    }
+
+    private StudentModel studentModel = new StudentModel();
+    private List<ModelsGroup> groups;
+    private List<Student> students;
+
+    //Data
+    private string GetGroupName(int? GroupId)
+    {
+        var groupsController = new GroupsController();
+        int groupIdValue = GroupId.GetValueOrDefault();
+        var result = groupsController.ReadGroup(groupIdValue);
+        return result.Name;
+    }
+
+
+    private void RefreshTable()
+    {
+        var studentsController = new StudentsController();
+        students = studentsController.ReadStudents().ToList();
+
+        var groupsController = new GroupsController();
+        groups = groupsController.ReadGroups().ToList();
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        RefreshTable();
+    }
+
+    //Delete
+    private async Task DeleteStudent(int id)
+    {
+        var studentsController = new StudentsController();
+        studentsController.DeleteStudent(id);
+        RefreshTable();
+    }
+
+    //Modal Edit
+    private bool showModalEdit = false;
+
+    private void ShowModalEdit(int id)
+    {
+
+    }
+
+    private void HideModalEdit()
+    {
+        showModalEdit = false;
+        studentModel = new StudentModel();
+    }
+}

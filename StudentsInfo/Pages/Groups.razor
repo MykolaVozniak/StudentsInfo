@@ -125,8 +125,9 @@
     private string GetFacultyName(int? FacultyId)
     {
         var facultiesController = new FacultiesController();
-        var name = facultiesController.GetFacultyName(FacultyId);
-        return name;
+        int facultyIdValue = FacultyId.GetValueOrDefault();
+        var result = facultiesController.ReadFaculty(facultyIdValue);
+        return result.Name;
     }
 
     private void GetStudentsCount()

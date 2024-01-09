@@ -88,6 +88,5 @@
     <Build Include="dbo\Stored Procedures\Students\SP_Student_Update.sql" />
     <Build Include="dbo\Stored Procedures\SP_Read_Departments_By_FacultyId.sql" />
     <Build Include="dbo\Stored Procedures\SP_Delete_Departments_By_FacultyId.sql" />
-    <Build Include="dbo\Stored Procedures\SP_Get_Faculty_Name.sql" />
   </ItemGroup>
 </Project>
